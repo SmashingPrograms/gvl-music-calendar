@@ -1,17 +1,10 @@
 from flask import Flask, jsonify
 from get_events import get_events
-import sqlite3
+from opensearchpy import OpenSearch
 
 app = Flask(__name__)
 
 events = get_events()
-
-conn = sqlite3.connect('db/data.db')
-c = conn.cursor()
-c.execute('''CREATE TABLE events
-                (summary text, updated text, description text, start text, end text, location text, created text, htmlLink text, id text)''')
-conn.commit()
-conn.close()
 
 # needed variables
 # - summary (title)
@@ -23,23 +16,36 @@ conn.close()
 # - created
 # - htmlLink
 # - id
+# Put all events into opensearchpy cluster. But only include the fields listed in needed variables. Sort by "id" field.
 
+opensearch = OpenSearch(hosts=['http://localhost:9200/'])
 
 @app.route('/api', methods=['GET'])
 def hello_world():
-    # put all events into database. Use id as primary key. If id already exists, update the event. Name each column the name in needed variables, and look for the name in the json object.
+    # Put all events into opensearchpy cluster. But only include the fields listed in needed variables. Sort by "id" field.
+    index_name = 'events'
+    index_exists = opensearch.indices.exists(index=index_name)
+    if index_exists:
+        print(f"Index '{index_name}' already exists.")
+    else:
+        opensearch.indices.create(index=index_name)
+        print(f"Index '{index_name}' created successfully.")
     for event in events:
-        conn = sqlite3.connect('db/data.db')
-        c = conn.cursor()
-        c.execute("INSERT INTO events VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(event['summary'], event['updated'], event['description'], event['start']['dateTime'], event['end']['dateTime'], event['location'], event['created'], event['htmlLink'], event['id']))
-        conn.commit()
-        conn.close()
-    conn2 = sqlite3.connect('db/data.db')
-    c2 = conn2.cursor()
-    c2.execute("SELECT * FROM events")
-    data = c2.fetchall()
-    # conn2.close()
-    return jsonify(data)
+        event_document = {
+            "summary": event["summary"],
+            "updated": event["updated"],
+            "description": event["description"],
+            "start": event["start"]["dateTime"],
+            "end": event["end"]["dateTime"],
+            "location": event["location"],
+            "created": event["created"],
+            "htmlLink": event["htmlLink"],
+            "id": event["id"]
+        }
+        opensearch.index(index='events', body=event_document)
+        # search_results = opensearch.search(index='events', body={"sort": "id"})
+        # print(search_results)
+    return jsonify(events)
 
 if __name__ == '__main__':
     app.run()
