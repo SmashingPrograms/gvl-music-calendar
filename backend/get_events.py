@@ -101,4 +101,4 @@ def get_events():
         print(f"An error occurred: {error}")
         return None
 
-get_events()
+# get_events()

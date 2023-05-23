@@ -1,10 +1,21 @@
 from flask import Flask, jsonify
 from get_events import get_events
-from opensearchpy import OpenSearch
+# from opensearchpy import OpenSearch
+from elasticsearch import Elasticsearch
 
 app = Flask(__name__)
 
-events = get_events()
+def read_textfile(path):
+    return open(path, 'r').read()
+
+private_folder = "../private"
+username_path = f"{private_folder}/username.txt"
+password_path = f"{private_folder}/password.txt"
+
+username=read_textfile(username_path)
+password=read_textfile(password_path)
+
+print("I got here.")
 
 # needed variables
 # - summary (title)
@@ -18,34 +29,14 @@ events = get_events()
 # - id
 # Put all events into opensearchpy cluster. But only include the fields listed in needed variables. Sort by "id" field.
 
-opensearch = OpenSearch(hosts=['http://localhost:9200/'])
-
 @app.route('/api', methods=['GET'])
 def hello_world():
-    # Put all events into opensearchpy cluster. But only include the fields listed in needed variables. Sort by "id" field.
-    index_name = 'events'
-    index_exists = opensearch.indices.exists(index=index_name)
-    if index_exists:
-        print(f"Index '{index_name}' already exists.")
-    else:
-        opensearch.indices.create(index=index_name)
-        print(f"Index '{index_name}' created successfully.")
-    for event in events:
-        event_document = {
-            "summary": event["summary"],
-            "updated": event["updated"],
-            "description": event["description"],
-            "start": event["start"]["dateTime"],
-            "end": event["end"]["dateTime"],
-            "location": event["location"],
-            "created": event["created"],
-            "htmlLink": event["htmlLink"],
-            "id": event["id"]
-        }
-        opensearch.index(index='events', body=event_document)
-        # search_results = opensearch.search(index='events', body={"sort": "id"})
-        # print(search_results)
-    return jsonify(events)
+    es = Elasticsearch("https://localhost:9200", http_auth=(username, password), verify_certs=False)
+    print("Am I getting this far?")
+    # events = get_events()
+
+    
+    return es.info().body
 
 if __name__ == '__main__':
     app.run()
