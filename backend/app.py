@@ -33,7 +33,7 @@ print("I got here.")
 def hello_world():
     es = Elasticsearch("https://localhost:9200", http_auth=(username, password), verify_certs=False)
     print("Am I getting this far?")
-    # events = get_events()
+    events = get_events()
 
     
     return es.info().body

@@ -64,7 +64,7 @@ def get_events():
 
         if not events:
             print('No upcoming events found.')
-            exit()
+            return None
             # return
 
         # Prints the start and name of the next 10 events
