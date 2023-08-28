@@ -6,6 +6,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from google.auth.exceptions import RefreshError
 import yaml
 import io
 from googleapiclient.http import MediaIoBaseDownload
@@ -41,14 +42,16 @@ def get_events():
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
+            # try:
             creds.refresh(Request())
+            # with open(token_path, 'w') as token:
+            #     token.write(creds.to_json())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 credentials_path, SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open(token_path, 'w') as token:
-            token.write(creds.to_json())
+            creds = flow.run_local_server(port=0, prompt='consent')  # Add 'prompt' parameter
+            with open(token_path, 'w') as token:
+                token.write(creds.to_json())
 
     try:
         calendar_service = build('calendar', 'v3', credentials=creds)
@@ -68,34 +71,10 @@ def get_events():
             # return
 
         # Prints the start and name of the next 10 events
-        for event in events:
-            start = event['start'].get('dateTime', event['start'].get('date'))
-            print(start, event['summary'], event['location'], event['description'])
+        # for event in events:
+        #     # start = event['start'].get('dateTime', event['start'].get('date'))
+        #     print("")
         return events
-        #   print(event['attachments'])
-        #   print(event)
-        #   if 'attachments' in event:
-        #     for attachment in event['attachments']:
-        #         # try to download attachment
-        #         file_id = attachment['fileId']
-        #         filename = attachment['title']
-        #         try:
-        #           request = drive_service.files().get_media(fileId=file_id)
-        #           file = io.BytesIO()
-        #           downloader = MediaIoBaseDownload(file, request)
-        #           done = False
-        #           while done is False:
-        #               status, done = downloader.next_chunk()
-        #               print(f'Download {int(status.progress() * 100)}.')
-        #         except HttpError as error:
-        #             print(f'An error occurred: {error}')
-        #             file = None
-        #         # Write the attachment to a file
-        #         if file:
-        #           with open(f'{filename}', 'wb') as f:
-        #               f.write(file.getvalue())
-        #   else:
-        #       print("No attachments found for the event.")
 
     except HttpError as error:
         print(f"An error occurred: {error}")

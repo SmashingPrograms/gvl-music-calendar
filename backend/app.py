@@ -2,6 +2,8 @@ from flask import Flask, jsonify
 from get_events import get_events
 # from opensearchpy import OpenSearch
 from elasticsearch import Elasticsearch
+from handle_elastic import delete_index, create_index, get_list_of_indexes
+import json
 
 app = Flask(__name__)
 
@@ -35,8 +37,50 @@ def hello_world():
     print("Am I getting this far?")
     events = get_events()
 
+    events = {"events": events,}
+
+    # events = {
+    #     "summary": "Team Meeting",
+    #     "location": "Conference Room 101",
+    #     "start": {
+    #         "dateTime": "2023-08-28T10:00:00",
+    #         "timeZone": "America/New_York"
+    #     },
+    #     "end": {
+    #         "dateTime": "2023-08-28T11:00:00",
+    #         "timeZone": "America/New_York"
+    #     },
+    #     "description": "Discuss project status and upcoming tasks.",
+    #     "attendees": [
+    #         {
+    #             "email": "john@example.com",
+    #             "displayName": "John Doe"
+    #         },
+    #         {
+    #             "email": "jane@example.com",
+    #             "displayName": "Jane Smith"
+    #         }
+    #     ]
+    # }
+    # Insert the JSON data into Elasticsearch
+    index_name = "test_index_two"
+
+    # create_index(es, index_name, events)
     
-    return es.info().body
+    print(get_list_of_indexes(es))
+    
+    # return None
+    return es.info()
+
+# @app.route("/oauth2callback")
+# def oauth2callback():
+#     token = oauth.google.authorize_access_token(
+#         TOKEN_URL,
+#         redirect_uri=REDIRECT_URI
+#     )
+#     # Now you can use the `token` to make authorized API requests or exchange it for a refresh token.
+#     return "Authorization successful!"
+
 
 if __name__ == '__main__':
     app.run()
