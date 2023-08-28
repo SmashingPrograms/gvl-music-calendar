@@ -27,3 +27,32 @@ def get_list_of_indexes(es):
     index_list = es.indices.get_alias("*").keys()
 
     return index_list
+
+def get_full_data(es, index_name, document_id):
+
+    # Retrieve the document from the index
+    response = es.get(index=index_name, id=document_id)
+
+    # Extract the source data from the response
+    source_data = response['_source']
+
+    return source_data
+
+def get_document_ids_in_index(es, index_name):
+    # Search query (match all documents)
+    search_query = {
+        "query": {
+            "match_all": {}
+        }
+    }
+
+    # Perform the search
+    search_results = es.search(index=index_name, body=search_query)
+
+    # Extract document IDs from search results
+    document_ids = [hit["_id"] for hit in search_results["hits"]["hits"]]
+
+    # Print the list of document IDs
+    print("Document IDs in index '{}'".format(index_name))
+    for doc_id in document_ids:
+        print(doc_id)

@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from get_events import get_events
 # from opensearchpy import OpenSearch
 from elasticsearch import Elasticsearch
-from handle_elastic import delete_index, create_index, get_list_of_indexes
+from handle_elastic import delete_index, create_index, get_list_of_indexes, get_full_data, get_document_ids_in_index
 import json
 
 app = Flask(__name__)
@@ -64,10 +64,13 @@ def hello_world():
     # }
     # Insert the JSON data into Elasticsearch
     index_name = "test_index_two"
+    document_id = "DnmcO4oBGg9DdxoO92xb"
+
+    print(get_full_data(es, index_name, document_id))
 
     # create_index(es, index_name, events)
     
-    print(get_list_of_indexes(es))
+    # get_document_ids_in_index(es, index_name)
     
     # return None
     return es.info()
