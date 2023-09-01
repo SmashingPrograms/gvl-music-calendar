@@ -19,7 +19,7 @@ token_path = f"{private_folder}/token.json"
 credentials_path = f"{private_folder}/credentials.json"
 config_path = f"{private_folder}/config.yaml"
 
-def get_events():
+def get_calendar_events():
     # Read private/config.yaml and get the calendar_id attribute
     with open(config_path, 'r') as stream:
         try:
@@ -61,7 +61,7 @@ def get_events():
         now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
         print('Getting the upcoming 10 events')
         events_result = calendar_service.events().list(calendarId=calendar_id, timeMin=now,
-                                            maxResults=10, singleEvents=True,
+                                            singleEvents=True,
                                             orderBy='startTime').execute()
         events = events_result.get('items', [])
 
@@ -74,7 +74,7 @@ def get_events():
         # for event in events:
         #     # start = event['start'].get('dateTime', event['start'].get('date'))
         #     print("")
-        return events
+        return {"events": events}
 
     except HttpError as error:
         print(f"An error occurred: {error}")
