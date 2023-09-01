@@ -7,10 +7,22 @@ import time
 import threading
 
 def get_attachment_ids(attachments):
-    attachment_ids = []
-    for attachment in attachments:
-        attachment_ids.append(attachment["id"])
-    return attachment_ids
+    if attachments:
+        attachment_ids = []
+        for attachment in attachments:
+            attachment_ids.append(attachment["fileId"])
+        return attachment_ids
+    return None
+
+def get_value_from_dictionary(dictionary, key, key2=None):
+    if key2:
+        if key in dictionary:
+            if key2 in dictionary[key]:
+                return dictionary[key][key2]
+    else:
+        if key in dictionary:
+            return dictionary[key]
+    return None
 
 app = Flask(__name__)
 
@@ -69,17 +81,17 @@ def api():
     print(event_data[0])
     filtered_event_data = []
     for event in event_data:
-        title = event["summary"]
-        description = event["description"]
-        location = event["location"]
-        start = event["start"]["dateTime"]
-        end = event["end"]["dateTime"]
-        status = event["status"] # confirmed, cancelled, etc.
-        attachments = event["attachments"]
+        title = get_value_from_dictionary(event, "summary")
+        description = get_value_from_dictionary(event, "description")
+        location = get_value_from_dictionary(event, "location")
+        start = get_value_from_dictionary(event, "start", "dateTime")
+        end = get_value_from_dictionary(event, "end", "dateTime")
+        status = get_value_from_dictionary(event, "status") # confirmed, cancelled, etc.
+        attachments = get_value_from_dictionary(event, "attachments")
         attachment_ids = get_attachment_ids(attachments)
 
         # THIS WILL NEED TO BE TRACKED, to see if it has changed
-        sequence = event["sequence"]
+        # sequence = event["sequence"]
 
         filtered_event = {
             "title": title,
@@ -88,8 +100,7 @@ def api():
             "start": start,
             "end": end,
             "status": status,
-            "attachment_ids": attachment_ids,
-            "sequence": sequence
+            "attachments": attachment_ids,
         }
 
         filtered_event_data.append(filtered_event)
