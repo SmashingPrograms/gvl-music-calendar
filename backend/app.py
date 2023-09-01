@@ -6,6 +6,12 @@ import json
 import time
 import threading
 
+def get_attachment_ids(attachments):
+    attachment_ids = []
+    for attachment in attachments:
+        attachment_ids.append(attachment["id"])
+    return attachment_ids
+
 app = Flask(__name__)
 
 def read_textfile(path):
@@ -55,13 +61,46 @@ update_thread.start()
 # @app.before_first_request
 # def before_first_request()
 @app.route('/api', methods=['GET'])
-def hello_world():
+def api():
     es = Elasticsearch("https://localhost:9200", http_auth=(username, password), verify_certs=False)
     print("Get the current ElasticSearch data:")
     # events = get_events()
-    event_data = get_full_data(es, index_name, document_id)
+    event_data = get_full_data(es, index_name, document_id)["events"]
+    print(event_data[0])
+    filtered_event_data = []
+    for event in event_data:
+        title = event["summary"]
+        description = event["description"]
+        location = event["location"]
+        start = event["start"]["dateTime"]
+        end = event["end"]["dateTime"]
+        status = event["status"] # confirmed, cancelled, etc.
+        attachments = event["attachments"]
+        attachment_ids = get_attachment_ids(attachments)
+
+        # THIS WILL NEED TO BE TRACKED, to see if it has changed
+        sequence = event["sequence"]
+
+        filtered_event = {
+            "title": title,
+            "description": description,
+            "location": location,
+            "start": start,
+            "end": end,
+            "status": status,
+            "attachment_ids": attachment_ids,
+            "sequence": sequence
+        }
+
+        filtered_event_data.append(filtered_event)
+        # filtered_event_data.append({
+        #     "summary": event["summary"],
+        #     "start": event["start"],
+        #     "end": event["end"]
+        # })
+
     
-    return event_data
+    return filtered_event_data
 
 
 if __name__ == '__main__':
