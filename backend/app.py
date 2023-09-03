@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from get_events import get_calendar_events
 from elasticsearch import Elasticsearch
 from handle_elastic import delete_index, create_index, get_list_of_indexes, get_full_data, get_document_ids_in_index
@@ -25,6 +26,7 @@ def get_value_from_dictionary(dictionary, key, key2=None):
     return None
 
 app = Flask(__name__)
+CORS(app)
 
 def read_textfile(path):
     return open(path, 'r').read()
