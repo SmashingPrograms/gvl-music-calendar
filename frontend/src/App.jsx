@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Events from "./components/Events";
 
 function App() {
   const [data, setData] = useState(null);
@@ -23,10 +24,10 @@ function App() {
   return (
     <div className="App">
       <h1>Data from Backend:</h1>
-      {data ? (
-        <div>
-          <p>{data.toString()}</p> {/* Adjust this line based on your backend response structure */}
-        </div>
+      {data !== null ? (
+        <>
+          <Events data={data} /> 
+        </>
       ) : (
         <p>Loading data...</p>
       )}
