@@ -3,8 +3,8 @@ function Event(event) {
     const title = event.title;
     const description = event.description;
     const location = event.location;
-    const startTime = event.startTime;
-    const endTime = event.endTime;
+    const startTime = event.start;
+    const endTime = event.end;
     const attachments = event.attachments;
     
 

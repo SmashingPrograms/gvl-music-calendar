@@ -54,7 +54,9 @@ def update_elasticsearch_data():
     while True:
         with update_lock:
             # Fetch data from Google Calendar (replace with your implementation)
-            events = get_calendar_events()
+            events = {"events": get_calendar_events()}
+
+            print(events)
 
             # Update the specific document in Elasticsearch with the fetched data
             es.index(index=index_name, id=document_id, document=events)
@@ -80,7 +82,8 @@ def api():
     print("Get the current ElasticSearch data:")
     # events = get_events()
     event_data = get_full_data(es, index_name, document_id)["events"]
-    print(event_data[0])
+    # print(event_data[0])
+    print(event_data)
     filtered_event_data = []
     for event in event_data:
         title = get_value_from_dictionary(event, "summary")

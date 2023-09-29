@@ -24,9 +24,9 @@ function App() {
   return (
     <div className="App">
       <h1>Data from Backend:</h1>
-      {data !== null ? (
+      {data ? (
         <>
-          <Events data={data} /> 
+          <Events data={data} />
         </>
       ) : (
         <p>Loading data...</p>
