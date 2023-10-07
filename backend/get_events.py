@@ -17,6 +17,22 @@ token_path = f"{private_folder}/token.json"
 credentials_path = f"{private_folder}/credentials.json"
 config_path = f"{private_folder}/config.yaml"
 
+def add_to_config(item):
+    # Specify the YAML file path
+
+    # Read the existing YAML data from the file
+    with open(config_path, 'r') as file:
+        data = yaml.safe_load(file)
+
+    # Check if yaml_data is a list (assuming it's a list based on your example)
+    if isinstance(data, list):
+        # Add 'c' to the list
+        data.append('c')
+
+        # Write the modified YAML data back to the file
+        with open(data, 'w') as file:
+            yaml.dump(data, file, default_flow_style=False)
+
 def get_calendar_events():
     """Fetch events from multiple calendars."""
     
