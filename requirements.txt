@@ -1,7 +1,9 @@
 pyyaml
-# google-api-python-client
-# google-auth-httplib2
-# google-auth-oauthlib
-# google
-# googleapiclient
-# pytz
+google
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+pytz
+flask
+flask-cors
+elasticsearch

@@ -2,4 +2,5 @@
 private/
 images/
 backend/db/
-backend/__pycache__/
+*.pyc
+node_modules/
