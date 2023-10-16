@@ -42,7 +42,9 @@ password=read_textfile(password_path)
 index_name = "test_index_two"
 document_id = "DnmcO4oBGg9DdxoO92xb"
 
-es = Elasticsearch("https://localhost:9200", http_auth=(username, password), verify_certs=False)
+es = Elasticsearch("http://localhost:9200", verify_certs=False)
+
+# es = Elasticsearch("https://localhost:9200", http_auth=(username, password), verify_certs=False)
 
 
 
@@ -78,7 +80,7 @@ update_thread.start()
 # def before_first_request()
 @app.route('/api', methods=['GET'])
 def api():
-    es = Elasticsearch("https://localhost:9200", http_auth=(username, password), verify_certs=False)
+    # http_auth=(username, password),
     print("Get the current ElasticSearch data:")
     # events = get_events()
     event_data = get_full_data(es, index_name, document_id)["events"]
