@@ -31,6 +31,7 @@ CORS(app)
 def read_textfile(path):
     return open(path, 'r').read()
 
+# TODO: Move Elasticsearch credentials to environment variables
 private_folder = "../private"
 username_path = f"{private_folder}/username.txt"
 password_path = f"{private_folder}/password.txt"
@@ -38,10 +39,11 @@ password_path = f"{private_folder}/password.txt"
 username=read_textfile(username_path)
 password=read_textfile(password_path)
 
-
+# TODO: Move config to environment variables
 index_name = "test_index_two"
 document_id = "DnmcO4oBGg9DdxoO92xb"
 
+# TODO: Move Elasticsearch hostname and port to environment variables
 es = Elasticsearch("http://localhost:9200", verify_certs=False)
 
 # es = Elasticsearch("https://localhost:9200", http_auth=(username, password), verify_certs=False)
@@ -80,7 +82,8 @@ update_thread.start()
 # def before_first_request()
 @app.route('/api', methods=['GET'])
 def api():
-    # http_auth=(username, password),
+    # FIXME: why is this redefined instead of using the module global defined above?
+    es = Elasticsearch("https://localhost:9200", http_auth=(username, password), verify_certs=False)
     print("Get the current ElasticSearch data:")
     # events = get_events()
     event_data = get_full_data(es, index_name, document_id)["events"]
